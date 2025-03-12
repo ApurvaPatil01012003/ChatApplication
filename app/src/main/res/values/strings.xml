@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">ExampleFirst</string>
+    <string name="logs_will_appear_here">Logs will appear here...</string>
+</resources>
