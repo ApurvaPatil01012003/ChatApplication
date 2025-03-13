@@ -5,8 +5,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,11 +39,12 @@ public class LoadDataActivity extends AppCompatActivity {
     private ChatAdapterLoadData adapter;
     private List<ChatMessage> messageList = new ArrayList<>();
     private int totalMessages = 0;  // 🔹 Variable to store total messages count
-    private ImageView contactImage,backButton,btnSend;
-    private TextView contactName, contactNumber,contactInitials;
-   private EditText messageInput;
-   private Toolbar toolbarLoadData;
-   boolean isFirstLoad =true;
+    private ImageView contactImage, backButton, btnSend;
+    private TextView contactName, contactNumber, contactInitials;
+    private EditText messageInput;
+    private Toolbar toolbarLoadData;
+    boolean isFirstLoad = true;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,7 +53,7 @@ public class LoadDataActivity extends AppCompatActivity {
 
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        toolbarLoadData=findViewById(R.id.toolbarLoadData);
+        toolbarLoadData = findViewById(R.id.toolbarLoadData);
         backButton = findViewById(R.id.backButton);
 
         contactName = findViewById(R.id.contactName);
@@ -59,13 +62,23 @@ public class LoadDataActivity extends AppCompatActivity {
 
         contactName.setText(getIntent().getStringExtra("contact_name"));
         contactNumber.setText(getIntent().getStringExtra("wa_id"));
+        boolean isActive = getIntent().getBooleanExtra("isActive",false);
 
 
+        runOnUiThread(() -> {
+            LinearLayout messageInputLayout = findViewById(R.id.messageInputLayout);
+
+            if (isActive) {
+                messageInputLayout.setVisibility(View.VISIBLE);
+            } else {
+                messageInputLayout.setVisibility(View.GONE);
+            }
+        });
         String contactName = getIntent().getStringExtra("contact_name");
         contactInitials.setText(getInitials(contactName));
 
         // Handle Back Button Click
-       setSupportActionBar(toolbarLoadData);
+        setSupportActionBar(toolbarLoadData);
         backButton.setOnClickListener(view -> onBackPressed());
 
         // Get the waId and pageNo passed from MainActivity (if needed)
@@ -79,7 +92,8 @@ public class LoadDataActivity extends AppCompatActivity {
         // Fetch data from the URL
         //loadData(url);
         //loadAllData(waId);
-        loadChatPage(waId,isFirstLoad);
+        loadChatPage(waId, isFirstLoad);
+
 
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -90,8 +104,6 @@ public class LoadDataActivity extends AppCompatActivity {
                 }
             }
         });
-
-
 
 
     }
@@ -105,6 +117,7 @@ public class LoadDataActivity extends AppCompatActivity {
             return parts[0].substring(0, 2).toUpperCase();
         }
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
@@ -214,7 +227,6 @@ public class LoadDataActivity extends AppCompatActivity {
 //    }
 
 
-
     private int currentPage = 1;
     private boolean isLoading = false;
     private boolean hasMoreData = true;
@@ -274,7 +286,7 @@ public class LoadDataActivity extends AppCompatActivity {
             runOnUiThread(() -> {
                 if (newMessages.isEmpty()) return;
 
-                // **Step 2: Sort messages by timestamp**
+                //  Sort messages by timestamp**
                 Collections.sort(newMessages, Comparator.comparing(ChatMessage::getTimestamp));
 
                 for (ChatMessage msg : newMessages) {
@@ -309,6 +321,10 @@ public class LoadDataActivity extends AppCompatActivity {
             });
         }).start();
     }
+
+
+
+
 
 
 
@@ -394,5 +410,3 @@ public class LoadDataActivity extends AppCompatActivity {
 
 
 }
-
-

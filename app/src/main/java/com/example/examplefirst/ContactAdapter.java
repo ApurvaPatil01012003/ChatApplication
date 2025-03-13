@@ -4,19 +4,21 @@ package com.example.examplefirst;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 public class ContactAdapter extends BaseAdapter {
     private Context context;
     private List<Contact> contactList;
-    private int[] colors = {0xFFE57373, 0xFF81C784, 0xFF64B5F6, 0xFFFFD54F, 0xFFBA68C8};
+    //private int[] colors = {0xFFE57373, 0xFF81C784, 0xFF64B5F6, 0xFFFFD54F, 0xFFBA68C8};
 
     public ContactAdapter(Context context, List<Contact> contactList) {
         this.context = context;
@@ -68,9 +70,12 @@ public class ContactAdapter extends BaseAdapter {
         String initials = getInitials(contact.getName());
         circleTextView.setText(initials);
 
-        // Assign color dynamically
-        int colorIndex = position % colors.length;
-        circleTextView.setBackgroundColor(colors[colorIndex]);
+
+        if (contact.isActive()) {
+            circleTextView.setBackgroundResource(R.drawable.green_circle);
+        } else {
+            circleTextView.setBackgroundResource(R.drawable.gray_circle);
+        }
 
         return convertView;
     }
@@ -84,4 +89,20 @@ public class ContactAdapter extends BaseAdapter {
             return parts[0].substring(0, 2).toUpperCase();
         }
     }
+    private boolean isUserActive(long lastActiveTime) {
+        long currentTime = System.currentTimeMillis();
+        boolean isActive = (currentTime - lastActiveTime) <= (24 * 60 * 60 * 1000);
+
+        Log.d("ActiveCheck", "LastActiveTime: " + lastActiveTime + ", CurrentTime: " + currentTime + ", Active: " + isActive);
+        return isActive;
+    }
+    public void updateData(ArrayList<Contact> newContacts) {
+        contactList.clear();
+        contactList.addAll(newContacts);
+        notifyDataSetChanged();
+    }
+
+
+
+
 }
